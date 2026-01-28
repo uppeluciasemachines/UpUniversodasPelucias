@@ -38,13 +38,13 @@ export default function ProductCard({ product }: ProductCardProps) {
    * pre-carrega as proximas imagens do carrossel
    */
   useEffect(()=>{
-    const nextIndex = currentImageIndex + 1
+    if (typeof window === 'undefined') return
 
-    if (images[nextIndex]) {
+    images.forEach((src) =>{
       const img = new window.Image()
-      img.src = images[nextIndex]
-    }
-  }, [currentImageIndex, images])
+      img.src = src
+    })
+    }, [images])
 
   /**
    * Navega para a imagem anterior no carrossel
@@ -92,7 +92,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             alt={product.nome}
             fill
             className="object-cover"
-            
+            priority={currentImageIndex === 0}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         )}
