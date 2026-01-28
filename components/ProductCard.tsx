@@ -13,7 +13,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useCart } from '@/contexts/CartContext'
 import type { Product } from '@/types'
@@ -33,6 +33,18 @@ export default function ProductCard({ product }: ProductCardProps) {
       ? product.imagens
       : ['https://via.placeholder.com/400x400?text=Sem+Imagem']
   const currentImage = images[currentImageIndex]
+
+  /**
+   * pre-carrega as proximas imagens do carrossel
+   */
+  useEffect(()=>{
+    const nextIndex = currentImageIndex + 1
+
+    if (images[nextIndex]) {
+      const img = new window.Image()
+      img.src = images[nextIndex]
+    }
+  }, [currentImageIndex, images])
 
   /**
    * Navega para a imagem anterior no carrossel
@@ -80,7 +92,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             alt={product.nome}
             fill
             className="object-cover"
-            priority={true}
+            priority
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         )}
