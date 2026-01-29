@@ -92,7 +92,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             alt={product.nome}
             fill
             className="object-cover"
-            priority={currentImageIndex === 0}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         )}
@@ -167,7 +166,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       {/* Informações do produto */}
       <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
+        <h3 className="text-sm font-semibold text-gray-800 mb-1 leading-tight line-clamp-2">
           {product.nome}
         </h3>
 
