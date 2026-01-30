@@ -1,12 +1,5 @@
 /**
  * Componente Filters - Barra de filtros de categoria
- * 
- * Exibe botões de filtro para:
- * - Categorias principais (Todos, Personagens, Pelúcias Gigantes, etc.)
- * - Subcategorias (quando uma categoria principal está selecionada)
- * - Campo de busca
- * 
- * Os filtros são dinâmicos e não recarregam a página.
  */
 
 'use client'

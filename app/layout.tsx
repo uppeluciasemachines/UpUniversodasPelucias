@@ -1,5 +1,5 @@
 /**
- * Layout raiz da aplicação Next.js
+ * Layout raiz da aplicação
  * 
  * Este é o layout principal que envolve todas as páginas.
  * Aqui configuramos:

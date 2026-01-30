@@ -1,16 +1,5 @@
 /**
  * Componente Cart - Drawer lateral do carrinho
- * 
- * Exibe um drawer (painel lateral) que desliza da direita
- * mostrando todos os itens do carrinho.
- * 
- * Funcionalidades:
- * - Lista de produtos no carrinho
- * - Controle de quantidade (+ / -)
- * - Botão para remover item
- * - Cálculo do total
- * - Botão para enviar pedido via WhatsApp
- * - Botão para limpar carrinho
  */
 
 'use client'

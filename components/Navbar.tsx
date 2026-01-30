@@ -1,12 +1,5 @@
 /**
  * Componente Navbar - Barra de navegação principal
- * 
- * Navbar fixa no topo da página com:
- * - Logo da UP Pelúcias
- * - Links de navegação (Pelúcias, Novidades, Promoções)
- * - Ícone do carrinho com badge mostrando quantidade de itens
- * 
- * O carrinho abre um drawer lateral quando clicado.
  */
 
 'use client'

@@ -1,14 +1,5 @@
 /**
  * Componente ProductCard - Card de produto
- * 
- * Exibe um produto com:
- * - Carrossel de imagens (com setas e indicadores)
- * - Nome do produto
- * - Preço em destaque
- * - Botão "Adicionar ao Carrinho"
- * 
- * O carrossel permite navegar entre múltiplas imagens
- * do produto usando setas laterais e indicadores de slide.
  */
 
 'use client'
@@ -37,14 +28,18 @@ export default function ProductCard({ product }: ProductCardProps) {
   /**
    * pre-carrega as proximas imagens do carrossel
    */
-  useEffect(()=>{
+  useEffect(()=> {
     if (typeof window === 'undefined') return
-
-    images.forEach((src) =>{
+    const preload = (index:number) => {
+      if (!images[index]) return
       const img = new window.Image()
-      img.src = src
-    })
-    }, [images])
+      img.src = images[index]
+    }
+
+    preload(currentImageIndex + 1)
+    preload(currentImageIndex - 1)
+
+  }, [currentImageIndex, images])
 
   /**
    * Navega para a imagem anterior no carrossel

@@ -1,15 +1,5 @@
 /**
  * Context API para gerenciamento do carrinho de compras
- * 
- * Este contexto gerencia todo o estado do carrinho:
- * - Adicionar produtos
- * - Remover produtos
- * - Atualizar quantidades
- * - Limpar carrinho
- * - Calcular totais
- * 
- * O estado é persistido no localStorage para manter
- * o carrinho mesmo após recarregar a página.
  */
 
 'use client'
