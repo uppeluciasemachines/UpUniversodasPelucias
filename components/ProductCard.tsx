@@ -79,18 +79,17 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
       {/* Container do carrossel de imagens */}
-      <div className="relative aspect-square bg-gray-100" >
+      <div className="relative aspect-square bg-gray-100">
         {/* Imagem atual */}
         {currentImage && (
-          <Image
+         <img 
             src={currentImage}
             alt={product.nome}
-            width={220}
-            height={260}
             className="object-cover"
+            sizes="(max-width: 768px) 25vw, (max-width: 1200px) 50vw, 33vw"
             loading="lazy"
-            unoptimized
-          />
+
+           />
         )}
 
         {/* Setas de navegação (apenas se houver mais de uma imagem) */}
