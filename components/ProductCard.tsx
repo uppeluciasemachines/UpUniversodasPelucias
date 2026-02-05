@@ -85,7 +85,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           <Image
             src={currentImage}
             alt={product.nome}
-            fill
+            width={300}
+            height={300}
             className="object-cover"
             loading="lazy"
             unoptimized
