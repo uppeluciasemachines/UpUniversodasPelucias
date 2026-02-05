@@ -79,7 +79,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
       {/* Container do carrossel de imagens */}
-      <div className="relative aspect-square bg-gray-100">
+      <div className="relative aspect-square bg-gray-100" >
         {/* Imagem atual */}
         {currentImage && (
           <Image
@@ -87,7 +87,8 @@ export default function ProductCard({ product }: ProductCardProps) {
             alt={product.nome}
             fill
             className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            loading="lazy"
+            unoptimized
           />
         )}
 
