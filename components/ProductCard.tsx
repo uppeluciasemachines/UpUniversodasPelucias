@@ -1,13 +1,11 @@
-/**
- * Componente ProductCard - Card de produto
- */
-
 'use client'
 
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useCart } from '@/contexts/CartContext'
 import type { Product } from '@/types'
+
+// Cache global de imagens ja carregadas (persiste entre renders e componentes)
+const imageCache = new Set<string>()
 
 interface ProductCardProps {
   product: Product
@@ -16,59 +14,80 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart()
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [isImageLoaded, setIsImageLoaded] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
 
-  // Se não houver imagens, usa uma imagem placeholder
-  // Você pode substituir por uma imagem real ou remover esta funcionalidade
   const images =
     product.imagens.length > 0
       ? product.imagens
       : ['https://via.placeholder.com/400x400?text=Sem+Imagem']
   const currentImage = images[currentImageIndex]
 
-  /**
-   * pre-carrega as proximas imagens do carrossel
-   */
-  useEffect(()=> {
-    if (typeof window === 'undefined') return
-    const preload = (index:number) => {
-      if (!images[index]) return
+  // IntersectionObserver: so carrega a imagem quando o card fica visivel na tela
+  useEffect(() => {
+    const el = cardRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.disconnect() // para de observar apos ficar visivel
+        }
+      },
+      { rootMargin: '200px' } // comeca a carregar 200px antes de aparecer
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  // Pre-carrega a proxima imagem do carrossel (com cache)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !isVisible) return
+
+    const nextIndex =
+      currentImageIndex === images.length - 1 ? 0 : currentImageIndex + 1
+    const nextSrc = images[nextIndex]
+
+    if (nextSrc && !imageCache.has(nextSrc)) {
       const img = new window.Image()
-      img.src = images[index]
+      img.src = nextSrc
+      img.onload = () => imageCache.add(nextSrc)
     }
+  }, [currentImageIndex, images, isVisible])
 
-    preload(currentImageIndex + 1)
-    preload(currentImageIndex - 1)
+  // Reseta o estado de loading quando muda de imagem
+  useEffect(() => {
+    if (imageCache.has(currentImage)) {
+      setIsImageLoaded(true) // ja esta em cache, mostra direto
+    } else {
+      setIsImageLoaded(false)
+    }
+  }, [currentImage])
 
-  }, [currentImageIndex, images])
+  const handleImageLoad = useCallback(() => {
+    imageCache.add(currentImage)
+    setIsImageLoaded(true)
+  }, [currentImage])
 
-  /**
-   * Navega para a imagem anterior no carrossel
-   */
   const goToPrevious = () => {
     setCurrentImageIndex((prev) =>
       prev === 0 ? images.length - 1 : prev - 1
     )
   }
 
-  /**
-   * Navega para a próxima imagem no carrossel
-   */
   const goToNext = () => {
     setCurrentImageIndex((prev) =>
       prev === images.length - 1 ? 0 : prev + 1
     )
   }
 
-  /**
-   * Vai diretamente para uma imagem específica
-   */
   const goToImage = (index: number) => {
     setCurrentImageIndex(index)
   }
 
-  /**
-   * Formata o preço para exibição em reais
-   */
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -77,25 +96,35 @@ export default function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+    <div
+      ref={cardRef}
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+    >
       {/* Container do carrossel de imagens */}
-      <div className="relative aspect-square bg-gray-100">
-        {/* Imagem atual */}
-        {currentImage && (
-         <img 
-            src={currentImage}
-            alt={product.nome}
-            className="object-cover"
-            sizes="(max-width: 768px) 25vw, (max-width: 1200px) 50vw, 33vw"
-            loading="lazy"
-
-           />
+      <div className="relative aspect-square bg-gray-100 overflow-hidden">
+        {/* Skeleton enquanto carrega */}
+        {!isImageLoaded && (
+          <div className="absolute inset-0 bg-gray-200 animate-pulse" />
         )}
 
-        {/* Setas de navegação (apenas se houver mais de uma imagem) */}
+        {/* Imagem atual - so renderiza se o card esta visivel */}
+        {isVisible && currentImage && (
+          <img
+            src={currentImage || "/placeholder.svg"}
+            alt={product.nome}
+            width={400}
+            height={400}
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
+              isImageLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+            onLoad={handleImageLoad}
+            decoding="async"
+          />
+        )}
+
+        {/* Setas de navegacao */}
         {images.length > 1 && (
           <>
-            {/* Seta esquerda */}
             <button
               onClick={goToPrevious}
               className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-1 transition-colors"
@@ -117,11 +146,10 @@ export default function ProductCard({ product }: ProductCardProps) {
               </svg>
             </button>
 
-            {/* Seta direita */}
             <button
               onClick={goToNext}
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-1 transition-colors"
-              aria-label="Próxima imagem"
+              aria-label="Proxima imagem"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -141,7 +169,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </>
         )}
 
-        {/* Indicadores de slide (bolinhas) */}
+        {/* Indicadores de slide */}
         {images.length > 1 && (
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
             {images.map((_, index) => (
@@ -160,7 +188,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
       </div>
 
-      {/* Informações do produto */}
+      {/* Informacoes do produto */}
       <div className="p-4">
         <h3 className="text-sm font-semibold text-gray-800 mb-1 leading-tight line-clamp-2">
           {product.nome}
@@ -170,14 +198,13 @@ export default function ProductCard({ product }: ProductCardProps) {
           {formatPrice(product.preco)}
         </p>
 
-        {/* Botão adicionar ao carrinho */}
         <div className="flex justify-center">
           <button
-          onClick={() => addToCart(product)}
-          className=" bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2 rounded-lg text-sm whitespace-nowrap inline-flex items-center justify-center"
-        >
-        Escolher esse
-        </button>
+            onClick={() => addToCart(product)}
+            className="bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2 rounded-lg text-sm whitespace-nowrap inline-flex items-center justify-center"
+          >
+            Escolher esse
+          </button>
         </div>
       </div>
     </div>
