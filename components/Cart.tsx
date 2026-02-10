@@ -5,7 +5,6 @@
 'use client'
 
 import { useCart } from '@/contexts/CartContext'
-import Image from 'next/image'
 import { useEffect } from 'react'
 
 export default function Cart() {
@@ -150,10 +149,9 @@ export default function Cart() {
                   {/* Imagem do produto */}
                   <div className="relative w-20 h-20 flex-shrink-0 bg-gray-200 rounded">
                     {item.product.imagens[0] && (
-                      <Image
+                      <img 
                         src={item.product.imagens[0]}
                         alt={item.product.nome}
-                        fill
                         className="object-cover rounded"
                         sizes="80px"
                       />
